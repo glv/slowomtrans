@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Om Slow Transaction Demo</title>
+</head>
+<body>
+<p>
+    Each of these counters is incremented in a background
+    <code>core.async</code> <code>go-loop</code>, from 1 to 50.  Each counter
+    is accompanied by a vector of maps, which is transacted into the app state
+    alongside the counter.  However, the vectors are never referred to by a
+    component query, nor are they referenced in any way during rendering.  They
+    are simply added to the application state each time the counter is updated.
+</p>
+
+<div id="app"></div>
+
+<p>
+    If you run the counters in order, you will see that if the vector is
+    small (100 elements) the loop runs quickly.  If the vector is large (10K
+    elements) but "hidden" from the parser by being wrapped in an atom, it also
+    runs quickly.  But when a 10K-element vector is transacted directly into
+    the application state, it slows things down a lot.
+</p>
+
+<p>
+    This may seem contrived, but the real use comes from
+    <a href="https://github.com/glv/snergly">Snergly</a>, a play project where
+    I'm implementing maze-related algorithms in Clojure and animating those
+    algorithms in the browser. I use Om Next to implement the control panel
+    where you choose the maze algorithm and grid size (and eventually other
+    parameters) and then the algorithm runs using <code>core.async</code>,
+    sending each grid update through a channel, at the other end of which it is
+    transacted into the app state and then used to draw the current state of
+    the grid on a canvas.
+</p>
+
+<p>
+    To see interesting behavior, try running the counters in these different
+    orders:
+</p>
+
+<ul>
+    <li>1, 2, 3</li>
+    <li>3, 1, 2, 1</li>
+    <li>3, 2, 1</li>
+</ul>
+
+<p>
+    After running the slow counter 3, counter 1 becomes slow.  But counter 2
+    seems unaffected, and after running counter 2, counter 1 is fast again.
+    There's a weird kind of persistent effect going on.
+</p>
+
+<script src="js/main.js"></script>
+</body>
+</html>
