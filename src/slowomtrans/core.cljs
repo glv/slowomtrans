@@ -87,7 +87,7 @@
                    (dom/div
                      nil
                      (dom/button #js {:disabled active
-                                      :onClick (fn [e] (start-counter 10000 :counter2 :blob3 true))}
+                                      :onClick (fn [e] (start-counter 10000 :counter2 :blob2 true))}
                                  "Counter 2")
                      (dom/input #js {:type "text"
                                      :value counter2
